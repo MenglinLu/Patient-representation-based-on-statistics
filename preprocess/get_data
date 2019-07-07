@@ -1,0 +1,9 @@
+select * from (select *, extract(day FROM (age(deathtime::date , intime::date))) as aaaaa from 
+(select t1.*, t2.*, extract(year FROM (age(intime::date , dob::date)))+1 as age_interval from
+(select t_firsticu.*, b.dob, b.dod_hosp, b.gender from
+(select * from
+(select row_id, subject_id, hadm_id, icustay_id, dbsource, first_careunit, last_careunit, first_wardid, last_wardid, intime, outtime, los, row_number() over (partition by hadm_id order by intime)
+from mimiciii.icustays) t
+where row_number=1 and los>1) t_firsticu left join mimiciii.patients b on t_firsticu.subject_id=b.subject_id) t1 left join mimiciii.admissions t2 on t1.hadm_id=t2.hadm_id) t3
+where age_interval>15  and (deathtime isnull or deathtime >intime)) tttt
+	
